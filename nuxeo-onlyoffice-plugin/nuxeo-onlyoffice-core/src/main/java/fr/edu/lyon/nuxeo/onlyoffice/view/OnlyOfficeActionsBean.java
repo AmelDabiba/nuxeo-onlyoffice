@@ -114,32 +114,21 @@ public class OnlyOfficeActionsBean implements Serializable
 	
 	public boolean isManagedList(DocumentModel doc)
 	{
-		 doc = navigationContext.getCurrentDocument();
-		if (doc==null)
-		{
-			return false;
-		}
-
-		BlobHolder bh = currentDocument.getAdapter(BlobHolder.class);
-		if (bh == null) {
-            throw new NuxeoException(String.format("Document %s (%s) is not a BlobHolder, cannot get Drive Edit URL.",
-                    currentDocument.getPathAsString(), currentDocument.getId()));
+	
+	
+            if (doc == null || !documentManager.exists(doc.getRef())) {
+               return false;
+             }
+             if (doc.isFolder() || doc.isProxy()) {
+              return false;
+             }
+             if (!documentManager.hasPermission(doc.getRef(), SecurityConstants.WRITE)) {
+              return false;
+             }
+           
+             return getFileSystemItem(doc) != null;
+             
         }
-        Blob blob = bh.getBlob();
-        if (blob == null) {
-            throw new NuxeoException(String.format("Document %s (%s) has no blob, cannot get Drive Edit URL.",
-                    currentDocument.getPathAsString(), currentDocument.getId()));
-       }
-		
-		boolean isFile = !doc.hasFacet("Folderish") && blob!=null && blob.getFilename() != null;
-
-		if (isFile)
-		{
-			return FileUtility.isManagedList(blob.getFilename());
-		}
-
-		return false;
-}
 	
 	
 
