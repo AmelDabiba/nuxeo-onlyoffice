@@ -111,6 +111,26 @@ public class OnlyOfficeActionsBean implements Serializable
 
 		return false;
 	}
+	
+	
+	public boolean canEditOnlyOffice(DocumentModel doc)
+	{
+	
+             if (doc == null || !documentManager.exists(doc.getRef())) {
+               return false;
+             }
+             if (doc.isFolder() || doc.isProxy()) {
+              return false;
+             }
+             if (!documentManager.hasPermission(doc.getRef(), SecurityConstants.WRITE)) {
+              return false;
+             }
+            
+             return getFileSystemItem(doc) != null;
+        }
+	
+	
+	
 
 	public boolean needConfirmation()
 	{
