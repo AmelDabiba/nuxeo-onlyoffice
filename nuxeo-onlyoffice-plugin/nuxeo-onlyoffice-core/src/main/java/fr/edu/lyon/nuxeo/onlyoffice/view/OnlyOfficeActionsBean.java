@@ -120,7 +120,17 @@ public class OnlyOfficeActionsBean implements Serializable
 			return false;
 		}
 
-		Blob blob=getDocumentBlob(doc);
+		BlobHolder bh = currentDocument.getAdapter(BlobHolder.class);
+		if (bh == null) {
+            throw new NuxeoException(String.format("Document %s (%s) is not a BlobHolder, cannot get Drive Edit URL.",
+                    currentDocument.getPathAsString(), currentDocument.getId()));
+        }
+        Blob blob = bh.getBlob();
+        if (blob == null) {
+            throw new NuxeoException(String.format("Document %s (%s) has no blob, cannot get Drive Edit URL.",
+                    currentDocument.getPathAsString(), currentDocument.getId()));
+       }
+		
 		boolean isFile = !doc.hasFacet("Folderish") && blob!=null && blob.getFilename() != null;
 
 		if (isFile)
