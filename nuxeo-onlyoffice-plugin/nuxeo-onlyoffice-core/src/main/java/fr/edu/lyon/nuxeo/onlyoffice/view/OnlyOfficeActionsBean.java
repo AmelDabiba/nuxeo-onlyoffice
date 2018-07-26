@@ -116,17 +116,21 @@ public class OnlyOfficeActionsBean implements Serializable
 	{
 	
 	
-            if (doc == null || !documentManager.exists(doc.getRef())) {
-               return false;
-             }
-             if (doc.isFolder() || doc.isProxy()) {
-              return false;
-             }
-             if (!documentManager.hasPermission(doc.getRef(), SecurityConstants.WRITE)) {
-              return false;
-             }
-           
-             return getFileSystemItem(doc) != null;
+            doc = navigationContext.getCurrentDocument();
+		if (doc==null)
+		{
+			return false;
+		}
+
+		Blob blob=getDocumentBlob(doc);
+		boolean isFile = !doc.hasFacet("Folderish") && blob!=null && blob.getFilename() != null;
+
+		if (isFile)
+		{
+			return FileUtility.isManaged(blob.getFilename());
+		}
+
+		return false;
              
         }
 	
